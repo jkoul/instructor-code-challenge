@@ -1,5 +1,5 @@
 function search(keyword) {
-  var url = 'http://www.omdbapi.com/?s='+escape(keyword);
+  var url = 'https://www.omdbapi.com/?s='+escape(keyword);
 
   $.getJSON(url)
   .done(function(imdbResponse){
