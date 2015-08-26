@@ -29,7 +29,7 @@ function imdbDone(searchKeyword, imdbSearchData) {
 
 function show(imdbId) {
   if (!imdbId) return;
-  var url = 'http://www.omdbapi.com/?i='+imdbId;
+  var url = 'https://www.omdbapi.com/?i='+imdbId;
   $.getJSON(url).then(function(imdbMovieData) {
     var movieData = {
       "Title": imdbMovieData.Title,
