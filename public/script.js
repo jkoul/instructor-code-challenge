@@ -1,8 +1,9 @@
+
+// Retrieve external API data based on search field
 function search(keyword) {
   var url = 'https://www.omdbapi.com/?s='+escape(keyword);
-
-  $.getJSON(url)
-  .done(function(imdbResponse){
+  var request = new XMLHttpRequest();
+  request.open('GET', url, true).done(function(imdbResponse){
     // We want to use both the search keyword and the imdb response in imdbDone
     //   We use an anonymous function to pass both.
     imdbDone(keyword, imdbResponse);
@@ -13,46 +14,48 @@ function search(keyword) {
       message += "(" + errorMessage + ")";
     }
     message += ".  Please try again.";
-    $('#movie-detail').html("<h2 class='fail'>" + message + "</h2>");
+    document.getElementById('movie-detail').innerHTML("<h2 class='fail'>" + message + "</h2>");
   });
 }
 
+// Show drop-down list of movies when retrieved
 function imdbDone(searchKeyword, imdbSearchData) {
   var display = '<option value="">Movies matching "'+ searchKeyword +'"...</option>';
   for (var i=0; i < imdbSearchData.Search.length; i++) {
     var movie = imdbSearchData.Search[i];
     display += ['<option value="', movie.imdbID, '">', movie.Title, '</option>'].join('');
   };
-  $('#movie-list').show().html(display);
+  document.getElementById('movie-list').show().innerHTML(display);
 }
 
-
+// Show info about selected movie
 function show(imdbId) {
   if (!imdbId) return;
   var url = 'https://www.omdbapi.com/?i='+imdbId;
-  $.getJSON(url).then(function(imdbMovieData) {
+  var request = new XMLHttpRequest();
+  request.open('GET', url, true).then(function(imdbMovieData) {
     var movieData = {
-      "Title": imdbMovieData.Title,
-      "Year": imdbMovieData.Year,
-      "Plot": imdbMovieData.Plot,
-      "Poster": imdbMovieData.Poster,
+      "name": imdbMovieData.Title,
+      "year": imdbMovieData.Year,
+      "plot": imdbMovieData.Plot,
+      "poster": imdbMovieData.Poster,
       "imdbRating": imdbMovieData.imdbRating,
-      "imdbID": imdbId
+      "oid": imdbId
     };
-    var detail = '<h2>Title: ' + imdbMovieData.Title + '</h2>';
+    var detail = '<h2>Name: ' + imdbMovieData.Title + '</h2>';
     detail += '<form method="post" action="/favorites">'
-    detail += '<input type="hidden" name="Title" value="' + imdbMovieData.Title + '">'
-    detail += '<input type="hidden" name="Year" value="' + imdbMovieData.Year + '">'
-    detail += '<input type="hidden" name="Plot" value="' + imdbMovieData.Plot + '">'
-    detail += '<input type="hidden" name="Poster" value="' + imdbMovieData.Poster + '">'
+    detail += '<input type="hidden" name="name" value="' + imdbMovieData.Title + '">'
+    detail += '<input type="hidden" name="year" value="' + imdbMovieData.Year + '">'
+    detail += '<input type="hidden" name="plot" value="' + imdbMovieData.Plot + '">'
+    detail += '<input type="hidden" name="poster" value="' + imdbMovieData.Poster + '">'
     detail += '<input type="hidden" name="imdbRating" value="' + imdbMovieData.imdbRating + '">'
-    detail += '<input type="hidden" name="imdbID" value="' + imdbId + '">'
+    detail += '<input type="hidden" name="oid" value="' + imdbId + '">'
     detail += '<input type="submit" value="Add to Favorites">';
     detail += '<p>Year Released: ' + imdbMovieData.Year + '</p>';
     detail += '<p>Summary: ' + imdbMovieData.Plot + '</p>';
     detail += '<p>IMDB Rating: ' + imdbMovieData.imdbRating + '</p>';
     detail += '<img src="'+ imdbMovieData.Poster +'" alt="'+ imdbMovieData.Title +'">';
-    $('#movie-detail').html(detail);
+    document.getElementById('movie-detail').innerHTML(detail);
     });
   }
 
@@ -61,18 +64,18 @@ function show(imdbId) {
 
 // Search form:
 
-$('#search').on('submit', function(evt) {
+document.getElementById('search').addEventListener('submit', function(evt) {
   evt.preventDefault();
-  var $search = $('#movie-search');
-  var keyword = $search.val();
-  $search.val('');
-
+  var movsearch = document.getElementById('movie-search');
+  var keyword = movsearch.value;
+  search.value = '';
   search(keyword);
 });
 
 
 // Movie selector:
 
-$('#movie-list').hide().on('change', function() {
+document.getElementById('movie-list').style.display = "none";
+document.getElementById('movie-list').addEventListener('change', function() {
   show(this.value);
 });
